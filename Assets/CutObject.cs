@@ -30,6 +30,7 @@ public class CutObject : MonoBehaviour
 		Vector3[] vertices = mesh.vertices;
 		Vector3[] normals = mesh.normals;
 		int[] triangles = mesh.triangles;
+		//convert the vertices to global coordinate
 		for(int i = 0; i < vertices.Length; i++ )
 			vertices[i] = v.transform.TransformPoint(vertices[i]);
 
