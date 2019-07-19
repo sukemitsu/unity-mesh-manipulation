@@ -1,6 +1,6 @@
 # Unity Mesh Manipulation Test
 
-This is a repository for testing unit Mesh features. It includes the direct access to vertices, normals, uvs and triangles.
+This is a repository for testing unity Mesh features. It includes the direct access to vertices, normals, uvs and triangles.
 
 # Current Update
 
