@@ -25,6 +25,7 @@ public class CutObject : MonoBehaviour
 // Keeps the triangle that is under the cutting plane.
 	void Cut(GameObject v, GameObject cutPlane)
 	{
+		// Projection is not a correct way.
 		// get the mesh data from GameObject v
 		Mesh mesh = v.GetComponent<MeshFilter>().mesh;
 		Vector3[] vertices = mesh.vertices;
