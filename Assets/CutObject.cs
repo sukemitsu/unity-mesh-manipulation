@@ -52,6 +52,10 @@ public class CutObject : MonoBehaviour
 		int[] triangles = mesh.triangles;
 		int[] pointCount = new int[triangles.Length]; // number of points of a triangle [above, under, 0]
 
+		//convert the vertices to global coordinate
+		for(int i = 0; i < vertices.Length; i++ )
+			vertices[i] = v.transform.TransformPoint(vertices[i]);
+
 		Vector3[] newVertices = vertices.Clone() as Vector3[];
 		List<int> newTriangles = new List<int>();
 
