@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class CutObject : MonoBehaviour
 {
@@ -30,28 +31,33 @@ public class CutObject : MonoBehaviour
 		Vector3[] vertices = mesh.vertices;
 		Vector3[] normals = mesh.normals;
 		int[] triangles = mesh.triangles;
-		for(int i = 0; i < vertices.Length; i++ )
-			vertices[i] = v.transform.TransformPoint(vertices[i]);
+		int[] sides = new int[vertices.Length]; // 1 : above, 0 : on the plane, -1 : under
 
 		// get the information from cutting plane
 		Vector3 n = cutPlane.transform.TransformVector(cutPlane.GetComponent<MeshFilter>().mesh.normals[0]);
 		Vector3 p = cutPlane.transform.position;
 
+		// switch to global coord. and check which side the point is.
+		for(int i = 0; i < vertices.Length; i++ )
+		{
+			float s;
+			vertices[i] = v.transform.TransformPoint(vertices[i]);
+			s = Vector3.Dot( vertices[i]-p, n);
+			sides[i] = Math.Sign(s);
+		}
 
 		List<int> newTriangles = new List<int>();
-
 		for(var i = 0; i < triangles.Length; i+=3)
 		{
-			float s0, s1, s2;
-			s0 = Vector3.Dot( vertices[ triangles[i]  ]-p, n );
-			s1 = Vector3.Dot( vertices[ triangles[i+1]]-p, n );
-			s2 = Vector3.Dot( vertices[ triangles[i+2]]-p, n );
+			int vi0 = triangles[i];
+			int vi1 = triangles[i+1];
+			int vi2 = triangles[i+2];
 			// if all the three points are under the plane, keep it
-			if( s0 <= 0 && s1 <= 0&& s2 <= 0 )
+			if( sides[vi0]<=0 && sides[vi1]<=0 && sides[vi2]<=0 )
 			{
-				newTriangles.Add( triangles[i] );
-				newTriangles.Add( triangles[i+1] );
-				newTriangles.Add( triangles[i+2] );
+				newTriangles.Add( vi0 );
+				newTriangles.Add( vi1 );
+				newTriangles.Add( vi2 );
 			}
 			// otherwise, delete it
 		}
