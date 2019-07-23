@@ -52,13 +52,6 @@ public class CutObject : MonoBehaviour
 		int[] triangles = mesh.triangles;
 		int[] pointCount = new int[triangles.Length]; // number of points of a triangle [above, under, 0]
 
-		//convert the vertices to global coordinate
-		for(int i = 0; i < vertices.Length; i++ )
-			vertices[i] = v.transform.TransformPoint(vertices[i]);
-
-		Vector3[] newVertices = vertices.Clone() as Vector3[];
-		List<int> newTriangles = new List<int>();
-
 		// get the information from cutting plane
 		Vector3 n = cutPlane.transform.TransformVector(cutPlane.GetComponent<MeshFilter>().mesh.normals[0]);
 		Vector3 p = cutPlane.transform.position;
@@ -73,6 +66,9 @@ public class CutObject : MonoBehaviour
 			hasMoved[i] = false;
 		}
 
+		Vector3[] newVertices = vertices.Clone() as Vector3[];
+
+
 		for(int i = 0, cp = 0; i < triangles.Length; )
 		{
 			if( sides[ triangles[i] ] > 0 )
@@ -83,6 +79,7 @@ public class CutObject : MonoBehaviour
 				cp = i;
 		}
 
+		List<int> newTriangles = new List<int>();
 		for(var i = 0; i < triangles.Length; i+=3)
 		{
 			ProcessTriangle(triangles, i, pointCount, vertices, sides, hasMoved, newTriangles);
