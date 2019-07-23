@@ -22,13 +22,13 @@ public class CutObject : MonoBehaviour
     }
 
 
-	private void ProcessTriangle(int[] triangles, int ti, Vector3[] vertices, int[] sides, bool[] hasMoved, List<int> newTriangles)
+	private void ProcessTriangle(int[] triangles, int ti, int[] pointCount, Vector3[] vertices, int[] sides, bool[] hasMoved, List<int> newTriangles)
 	{
 		int vi0 = triangles[ti  ];
 		int vi1 = triangles[ti+1];
 		int vi2 = triangles[ti+2];
 		// if all the three points are under the plane, keep it
-		if( sides[vi0]<=0 && sides[vi1]<=0 && sides[vi2]<=0 )
+		if( pointCount[ti] == 0 )
 		{
 			newTriangles.Add( vi0 );
 			newTriangles.Add( vi1 );
@@ -46,9 +46,14 @@ public class CutObject : MonoBehaviour
 		Mesh mesh = v.GetComponent<MeshFilter>().mesh;
 		Vector3[] vertices = mesh.vertices;
 		Vector3[] normals = mesh.normals;
-		int[] triangles = mesh.triangles;
 		int[] sides = new int[vertices.Length]; // 1 : above, 0 : on the plane, -1 : under
-		bool[] hasMoved = new bool[vertices.Length];
+		bool[] hasMoved = new bool[vertices.Length]; // true if the vertices has moved
+
+		int[] triangles = mesh.triangles;
+		int[] pointCount = new int[triangles.Length]; // number of points of a triangle [above, under, 0]
+
+		Vector3[] newVertices = vertices.Clone() as Vector3[];
+		List<int> newTriangles = new List<int>();
 
 		// get the information from cutting plane
 		Vector3 n = cutPlane.transform.TransformVector(cutPlane.GetComponent<MeshFilter>().mesh.normals[0]);
@@ -64,10 +69,19 @@ public class CutObject : MonoBehaviour
 			hasMoved[i] = false;
 		}
 
-		List<int> newTriangles = new List<int>();
+		for(int i = 0, cp = 0; i < triangles.Length; )
+		{
+			if( sides[ triangles[i] ] > 0 )
+				pointCount[cp]++;
+			else if ( sides[ triangles[i] ] < 0 )
+				pointCount[cp+1]++;
+			if( ++i % 3 == 0 )
+				cp = i;
+		}
+
 		for(var i = 0; i < triangles.Length; i+=3)
 		{
-			ProcessTriangle(triangles, i, vertices, sides, hasMoved, newTriangles);
+			ProcessTriangle(triangles, i, pointCount, vertices, sides, hasMoved, newTriangles);
 		}
 
 		// https://stackoverflow.com/questions/1367504/converting-listint-to-int
