@@ -52,6 +52,10 @@ public class CutObject : MonoBehaviour
 		int[] triangles = mesh.triangles;
 		int[] pointCount = new int[triangles.Length]; // number of points of a triangle [above, under, 0]
 
+		// get the information from cutting plane
+		Vector3 n = cutPlane.transform.TransformVector(cutPlane.GetComponent<MeshFilter>().mesh.normals[0]);
+		Vector3 p = cutPlane.transform.position;
+
 		// switch to global coord. and check which side the point is. Set the point as "unmoved"
 		for(int i = 0; i < vertices.Length; i++ )
 		{
@@ -64,9 +68,6 @@ public class CutObject : MonoBehaviour
 
 		Vector3[] newVertices = vertices.Clone() as Vector3[];
 
-		// get the information from cutting plane
-		Vector3 n = cutPlane.transform.TransformVector(cutPlane.GetComponent<MeshFilter>().mesh.normals[0]);
-		Vector3 p = cutPlane.transform.position;
 
 		for(int i = 0, cp = 0; i < triangles.Length; )
 		{
