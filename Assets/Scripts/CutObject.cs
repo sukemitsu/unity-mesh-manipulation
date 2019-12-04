@@ -6,6 +6,7 @@ using System;
 public class CutObject : MonoBehaviour
 {
 	public GameObject cutPlane;
+    int[] seimvertex;
     // Start is called before the first frame update
     void Start()
     {
@@ -159,14 +160,34 @@ public class CutObject : MonoBehaviour
 // Keeps the triangle that is under the cutting plane.
 	void Cut(GameObject v, GameObject cutPlane)
 	{
-		// get the mesh data from GameObject v
+		// get the mesh data from GameObject v        
 		Mesh mesh = v.GetComponent<MeshFilter>().mesh;
 		Vector3[] vertices = mesh.vertices;
 		Vector3[] normals = mesh.normals;
 		int[] sides = new int[vertices.Length]; // 1 : above, 0 : on the plane, -1 : under
 		int[] hasMovedTo = new int[vertices.Length]; // true if the vertices has moved
+        seimvertex = new int[vertices.Length];
 
-		int[] triangles = mesh.triangles;
+        for (int i = 0; i < vertices.Length - 1; i++)
+            seimvertex[i] = i;
+
+        for(int i = 0; i < vertices.Length - 1; i++)
+        {
+            for (int j = i + 1; j < vertices.Length; j++)
+            {
+                if ((vertices[i] - vertices[j]).sqrMagnitude < 0.0000001)
+                {
+                    seimvertex[j] = i;
+                }
+            }
+        }
+
+        for(int i = 0; i < vertices.Length; i++)
+        {
+            Debug.Log(i + "a"+seimvertex[i]);
+        }
+
+        int[] triangles = mesh.triangles;
 		int[] pointCount = new int[triangles.Length]; // number of points of a triangle [above, below, 0]
 
 		// get the information from cutting plane (global)
